@@ -1,5 +1,7 @@
 package neuronalnet
 
+import neuronalnet.math_.MathHelper
+
 /**
  * Created by Simon on 11.04.2015.
  */

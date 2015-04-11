@@ -1,7 +1,8 @@
 package neuronalnet.neurons
 
-import neuronalnet.{MathHelper, ActivationWeight, Application}
-import neuronalnet.ActivationWeight.ActivationWeight
+import neuronalnet.math_.MathHelper
+import neuronalnet.Application
+import ActivationWeight.ActivationWeight
 
 /**
  * Created by Simon on 11.04.2015.
@@ -28,8 +29,7 @@ class OutputNeuron extends Neuron  {
       case ActivationWeight.exeeded => {
         increaseCurrentActivationValue()
         setValue(newValue)
-        val result = MathHelper.sigmoid(value)
-        value = result
+        value = MathHelper.sigmoid(value)
        // println(" Jepaa we finished forward Prop with result: " + result)
       }
       case ActivationWeight.reset => {

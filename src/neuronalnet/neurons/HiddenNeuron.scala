@@ -1,8 +1,9 @@
 package neuronalnet.neurons
 
-import neuronalnet.ActivationWeight.ActivationWeight
-import neuronalnet.ActivationWeight.ActivationWeight
-import neuronalnet.{MathHelper, ActivationWeight, Application}
+import ActivationWeight.ActivationWeight
+import ActivationWeight.ActivationWeight
+import neuronalnet.math_.MathHelper
+import neuronalnet.Application
 
 /**
  * Created by Simon on 11.04.2015.

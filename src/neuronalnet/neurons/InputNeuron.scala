@@ -1,6 +1,6 @@
 package neuronalnet.neurons
 
-import neuronalnet.ActivationWeight.ActivationWeight
+import ActivationWeight.ActivationWeight
 import neuronalnet.Application
 
 /**

@@ -1,6 +1,8 @@
 package neuronalnet.nets
 
+
 import neuronalnet.layers.{HiddenLayer, InputLayer, OutputLayer}
+import neuronalnet.math_.MathHelper
 import neuronalnet.trainingData.TrainSet
 
 import scala.collection.mutable
@@ -14,6 +16,8 @@ class Net {
     outputLayer.neurons.apply(0).setResult(y)
   }
 
+
+
   def train(trainData: mutable.MutableList[TrainSet]):Double = {
     var J = 0.0
     trainData.foreach(D => {
@@ -24,37 +28,40 @@ class Net {
     })
     J = J / trainData.size
 
-    val inputError = Array[Double](0.0,0.0,0.0)
-    val hiddenError = Array[Double](0.0,0.0)
+    var inputError = Array.ofDim[Double](inputLayer.neurons.size*hiddenLayer.units)  // inputlayersize * hiddenlayer size?
+    var hiddenError = Array.ofDim[Double](hiddenLayer.neurons.size) // hiddenlayersize * outputlayersize
     trainData.foreach(D => {
       input(D.x1, D.x2)
       setResult(D.y)
 
       // Hidden Layer
-      hiddenError(0) = hiddenError(0) + hiddenLayer.neurons.apply(0).getError()
-      hiddenError(1) = hiddenError(1) +  hiddenLayer.neurons.apply(1).getError()
-
+      hiddenError = MathHelper.cumulateArrays(hiddenError, hiddenLayer.getError())
 
       // Input Layer
-      inputError(0) = inputError(0) + inputLayer.neurons.apply(0).getError()
-      inputError(1) = inputError(1) + inputLayer.neurons.apply(1).getError()
-      inputError(2) = inputError(2) + inputLayer.neurons.apply(2).getError()
-      //
+      inputError = MathHelper.cumulateArrays(inputError, inputLayer.getError())
+       //
     })
     // learning rate alpha
     val alpha = 0.9
+
+    inputError = MathHelper.divideEachElementInArray(inputError, trainData.size)
+    hiddenError = MathHelper.divideEachElementInArray(hiddenError, trainData.size)
+
+    //inputLayer.updateWeights(inputError, alpha)
+    //hiddenLayer.updateWeights(hiddenError,alpha)
 
 
 
     // new weights
     for (i <- 0 until inputError.length) {
-      val newWeight = inputError(i)/trainData.size
+      val newWeight = inputError(i)
       val connections = inputLayer.neurons.apply(i).postNeurons
       connections.apply(1).weight = connections.apply(1).weight - alpha*newWeight
     }
     for (i <- 0 until hiddenError.length) {
-      val newWeight = hiddenError(i)/trainData.size
-      hiddenLayer.neurons.apply(i).postNeurons.apply(0).weight = hiddenLayer.neurons.apply(i).postNeurons.apply(0).weight - alpha*newWeight
+      val newWeight = hiddenError(i)
+      val connections = hiddenLayer.neurons.apply(i).postNeurons
+      connections.apply(0).weight = connections.apply(0).weight - alpha*newWeight
     }
 
     J

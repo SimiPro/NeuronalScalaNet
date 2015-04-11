@@ -1,7 +1,7 @@
 package neuronalnet.neurons
 
-import neuronalnet.{MathHelper, ActivationWeight}
-import neuronalnet.ActivationWeight.ActivationWeight
+import ActivationWeight.ActivationWeight
+import neuronalnet.math_.MathHelper
 
 import scala.collection.mutable
 
