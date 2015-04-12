@@ -1,7 +1,7 @@
 package neuronalnet.nets
 
 
-import neuronalnet.layers.{HiddenLayer, InputLayer, OutputLayer}
+import neuronalnet.layers._
 import neuronalnet.math_.MathHelper
 import neuronalnet.trainingData.TrainSet
 
@@ -10,11 +10,25 @@ import scala.collection.mutable
 /**
  * Created by Simon on 11.04.2015.
  */
-class Net {
+class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer], outputLayer: OutputLayer) {
+  connectLayers()
 
   def setResult(y: Int) = {
     outputLayer.neurons.apply(0).setResult(y)
   }
+
+  def connectLayers():Unit = {
+    hiddenLayer.apply(0).connectPrevLayer(inputLayer)
+    var prevLayer = hiddenLayer.apply(0)
+    // multi hiddenLayer handlin
+    for (i <- 1 until hiddenLayer.length) {
+      hiddenLayer(i).connectPrevLayer(prevLayer)
+      prevLayer = hiddenLayer(i)
+    }
+    outputLayer.connectPrevLayer(prevLayer)
+  }
+
+
 
 
 
@@ -47,22 +61,8 @@ class Net {
     inputError = MathHelper.divideEachElementInArray(inputError, trainData.size)
     hiddenError = MathHelper.divideEachElementInArray(hiddenError, trainData.size)
 
-    //inputLayer.updateWeights(inputError, alpha)
-    //hiddenLayer.updateWeights(hiddenError,alpha)
-
-
-
-    // new weights
-    for (i <- 0 until inputError.length) {
-      val newWeight = inputError(i)
-      val connections = inputLayer.neurons.apply(i).postNeurons
-      connections.apply(1).weight = connections.apply(1).weight - alpha*newWeight
-    }
-    for (i <- 0 until hiddenError.length) {
-      val newWeight = hiddenError(i)
-      val connections = hiddenLayer.neurons.apply(i).postNeurons
-      connections.apply(0).weight = connections.apply(0).weight - alpha*newWeight
-    }
+    inputLayer.updateWeights(inputError, alpha)
+    hiddenLayer.updateWeights(hiddenError,alpha)
 
     J
   }
@@ -74,11 +74,65 @@ class Net {
     inputLayer.neurons.apply(2).setValue(input2)
   }
 
-  var inputLayer = new InputLayer(2)
-  var hiddenLayer = new HiddenLayer(1,inputLayer)
-  var outputLayer = new OutputLayer(1,hiddenLayer)
+}
+
+/**
+ * Class to Build a net. Default 1 Input Layer, 1 Hidden Layer, 1 Output Layer
+ * 2 Input Units, 1 Hidden Unit, 1 Output Unit
+ * so just to make easy And and Or nets
+ */
+class NetBuilder {
+  var inputLayerUnits = 2
+  var inputLayer = 1
+
+  var hiddenLayers = 1
+  var hiddenLayerUnits = 1
+  var hiddenLayers = mutable.MutableList[HiddenLayerBuilder]()
+
+  var outputLayer = 1
+  var outputLayerUnits = 1
+
+
+
+  def init() = {
+
+  }
+
+  init()
+
+
+
+  def setInputLayerUnits(units:Int):NetBuilder = {
+    inputLayerUnits = units
+    this
+  }
+
+  def addHiddenLayers(layer:HiddenLayerBuilder):NetBuilder = {
+    hiddenLayers += layer
+    this
+  }
+
+  def setOutputLayerUnits(units:Int):NetBuilder = {
+    outputLayerUnits = units
+    this
+  }
+  def setInputLayerUnits(units:Int):NetBuilder = {
+    inputLayerUnits = units
+    this
+  }
+
+
+  def build():Net = {
+      var net:Net = new Net()
+
+  }
+
+
+
+}
 
 
 
 
 }
+
