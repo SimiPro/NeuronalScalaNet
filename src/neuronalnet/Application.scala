@@ -1,6 +1,6 @@
 package neuronalnet
 
-import neuronalnet.nets.Net
+import neuronalnet.nets.{NetBuilder, Net}
 import neuronalnet.trainingData.TrainSet
 import scala.collection.mutable
 
@@ -12,7 +12,7 @@ object Application {
   val DEBUG = false
 
   def main(args: Array[String]) {
-    val neuronalNet = new Net()
+    val neuronalNet = new NetBuilder().build()
 
     var trainData = new mutable.MutableList[TrainSet]
     for (i <- 1 to 100) {
@@ -34,13 +34,13 @@ object Application {
     }
 
     neuronalNet.input(1,1)
-    println("Input: 1 1 Output: " + neuronalNet.outputLayer.neurons.apply(0).value)
+    println("Input: 1 1 Output: " + neuronalNet.getResult())
     neuronalNet.input(0,1)
-    println("Input: 0 1 Output: " + neuronalNet.outputLayer.neurons.apply(0).value)
+    println("Input: 0 1 Output: " + neuronalNet.getResult())
     neuronalNet.input(1,0)
-    println("Input: 1 0 Output: " + neuronalNet.outputLayer.neurons.apply(0).value)
+    println("Input: 1 0 Output: " + neuronalNet.getResult())
     neuronalNet.input(0,0)
-    println("Input: 0 0 Output: " + neuronalNet.outputLayer.neurons.apply(0).value)
+    println("Input: 0 0 Output: " + neuronalNet.getResult())
 
 
   }

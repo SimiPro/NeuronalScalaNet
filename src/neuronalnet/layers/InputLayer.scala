@@ -6,7 +6,8 @@ import neuronalnet.neurons.InputNeuron
  * Created by Simon on 11.04.2015.
  */
 class InputLayer(units:Int) extends Layer(units) {
-  
+
+
 
   override def createUnits(): Unit = {
     // add bias neuron first of all

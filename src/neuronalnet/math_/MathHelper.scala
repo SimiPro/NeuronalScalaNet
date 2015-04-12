@@ -1,8 +1,6 @@
 package neuronalnet.math_
 
-import neuronalnet.trainingData.TrainSet
 
-import scala.collection.mutable
 import scala.util.Random
 
 /**
@@ -12,6 +10,13 @@ object MathHelper {
   def divideEachElementInArray(x: Array[Double], value:Double):Array[Double] = {
     for (i <- 0 until x.size) {
       x(i) = x(i) / value
+    }
+    x
+  }
+
+  def divideEachElementInArray(x: Array[Array[Double]], value:Double):Array[Array[Double]] = {
+    for(j <- 0 until x.size)  {
+      x(j) = divideEachElementInArray(x(j), value)
     }
     x
   }

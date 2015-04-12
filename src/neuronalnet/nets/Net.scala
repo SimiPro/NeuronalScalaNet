@@ -10,7 +10,13 @@ import scala.collection.mutable
 /**
  * Created by Simon on 11.04.2015.
  */
-class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer], outputLayer: OutputLayer) {
+class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer], outputLayer: OutputLayer) {
+
+
+  def getResult() = {
+    outputLayer.neurons.apply(0).value
+  }
+
   connectLayers()
 
   def setResult(y: Int) = {
@@ -18,12 +24,14 @@ class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer],
   }
 
   def connectLayers():Unit = {
-    hiddenLayer.apply(0).connectPrevLayer(inputLayer)
-    var prevLayer = hiddenLayer.apply(0)
+    hiddenLayers.apply(0).connectPrevLayer(inputLayer)
+    inputLayer.connectNextLayer(hiddenLayers.apply(0))
+
+    var prevLayer = hiddenLayers.apply(0)
     // multi hiddenLayer handlin
-    for (i <- 1 until hiddenLayer.length) {
-      hiddenLayer(i).connectPrevLayer(prevLayer)
-      prevLayer = hiddenLayer(i)
+    for (i <- 1 until hiddenLayers.length) {
+      hiddenLayers(i).connectPrevLayer(prevLayer)
+      prevLayer = hiddenLayers(i)
     }
     outputLayer.connectPrevLayer(prevLayer)
   }
@@ -42,14 +50,25 @@ class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer],
     })
     J = J / trainData.size
 
-    var inputError = Array.ofDim[Double](inputLayer.neurons.size*hiddenLayer.units)  // inputlayersize * hiddenlayer size?
-    var hiddenError = Array.ofDim[Double](hiddenLayer.neurons.size) // hiddenlayersize * outputlayersize
+    var inputError = Array.ofDim[Double](inputLayer.neurons.size*inputLayer.postLayer.units)  // inputlayersize * hiddenlayer size?
+    var hiddenErrors = Array.ofDim[Array[Double]](hiddenLayers.size)
+    // init hidden errors
+    for (i <- 0 until hiddenLayers.size){
+      hiddenErrors(i) = Array.ofDim[Double](hiddenLayers(i).neurons.size) // mby hiddenlayersize * outputlayersize would work better
+    }
+
+
+    //var hiddenError = Array.ofDim[hiddenLayers.size, Double](hiddenLayer.neurons.size) // hiddenlayersize * outputlayersize
     trainData.foreach(D => {
       input(D.x1, D.x2)
       setResult(D.y)
 
       // Hidden Layer
-      hiddenError = MathHelper.cumulateArrays(hiddenError, hiddenLayer.getError())
+      for (i <- 0 until hiddenLayers.size){
+        val hiddenLayer = hiddenLayers.apply(i)
+        hiddenErrors(i) = MathHelper.cumulateArrays(hiddenErrors(i), hiddenLayer.getError())
+      }
+
 
       // Input Layer
       inputError = MathHelper.cumulateArrays(inputError, inputLayer.getError())
@@ -59,10 +78,13 @@ class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer],
     val alpha = 0.9
 
     inputError = MathHelper.divideEachElementInArray(inputError, trainData.size)
-    hiddenError = MathHelper.divideEachElementInArray(hiddenError, trainData.size)
+    hiddenErrors = MathHelper.divideEachElementInArray(hiddenErrors, trainData.size)
 
     inputLayer.updateWeights(inputError, alpha)
-    hiddenLayer.updateWeights(hiddenError,alpha)
+
+    for (i <- 0 until hiddenLayers.length) {
+      hiddenLayers(i).updateWeights(hiddenErrors(i), alpha)
+    }
 
     J
   }
@@ -76,63 +98,5 @@ class Net(inputLayer: InputLayer, hiddenLayer: mutable.MutableList[HiddenLayer],
 
 }
 
-/**
- * Class to Build a net. Default 1 Input Layer, 1 Hidden Layer, 1 Output Layer
- * 2 Input Units, 1 Hidden Unit, 1 Output Unit
- * so just to make easy And and Or nets
- */
-class NetBuilder {
-  var inputLayerUnits = 2
-  var inputLayer = 1
 
-  var hiddenLayers = 1
-  var hiddenLayerUnits = 1
-  var hiddenLayers = mutable.MutableList[HiddenLayerBuilder]()
-
-  var outputLayer = 1
-  var outputLayerUnits = 1
-
-
-
-  def init() = {
-
-  }
-
-  init()
-
-
-
-  def setInputLayerUnits(units:Int):NetBuilder = {
-    inputLayerUnits = units
-    this
-  }
-
-  def addHiddenLayers(layer:HiddenLayerBuilder):NetBuilder = {
-    hiddenLayers += layer
-    this
-  }
-
-  def setOutputLayerUnits(units:Int):NetBuilder = {
-    outputLayerUnits = units
-    this
-  }
-  def setInputLayerUnits(units:Int):NetBuilder = {
-    inputLayerUnits = units
-    this
-  }
-
-
-  def build():Net = {
-      var net:Net = new Net()
-
-  }
-
-
-
-}
-
-
-
-
-}
 

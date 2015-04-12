@@ -11,6 +11,13 @@ import scala.collection.mutable
  */
 abstract class Layer(var units:Int) {
   var neurons:mutable.MutableList[Neuron] = mutable.MutableList[Neuron]()
+  var postLayer:Layer = _
+
+  def connectNextLayer(postLayer: Layer) = {
+    this.postLayer = postLayer
+  }
+
+
   createUnits()
 
   def updateWeights(errors:Array[Double], alpha:Double) = {
