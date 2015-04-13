@@ -14,11 +14,11 @@ object Application {
   val DEBUG = false
 
   def main(args: Array[String]) {
-    val neuronalNet = new NetBuilder().build()
+
 
     var trainData = new mutable.MutableList[TrainSet]
     for (i <- 1 to 100) {
-      trainData += TrainSet(0,0,0)
+      trainData += TrainSet(0,0,1)
     }
     for (i <- 1 to 100) {
       trainData += TrainSet(0,1,0)
@@ -30,9 +30,18 @@ object Application {
       trainData += TrainSet(1,1,1)
     }
 
-    for (i <- 1 to 2500) {
-      val cost = neuronalNet.train(trainData)
-      println("Iteration: " + i + " | Cost: " + cost)
+
+    var cost = 0.1
+    var i = 1
+    var neuronalNet = new NetBuilder().build()
+    while(cost > 0.09) {
+      println("Try: " + i)
+      i = i +1
+      neuronalNet = new NetBuilder().build()
+      for (i <- 1 to 2500) {
+        cost = neuronalNet.train(trainData)
+        println("Iteration: " + i + " | Cost: " + cost)
+      }
     }
 
     neuronalNet.input(1,1)

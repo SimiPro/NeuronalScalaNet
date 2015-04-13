@@ -9,7 +9,11 @@ import scala.collection.mutable
  * Created by Simon on 11.04.2015.
  */
 abstract class Neuron {
-  def setResult(delta:Double, weight: Double)
+
+
+
+  def setResult(delta:Double, weight: Double): Unit = {
+  }
 
   var value = 0.0
   var finalValue = 0.0

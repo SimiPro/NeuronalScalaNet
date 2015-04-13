@@ -30,7 +30,6 @@ class OutputNeuron extends Neuron  {
         increaseCurrentActivationValue()
         setValue(newValue)
         value = MathHelper.sigmoid(value)
-       // println(" Jepaa we finished forward Prop with result: " + result)
       }
       case ActivationWeight.reset => {
         resetValues()
@@ -43,7 +42,7 @@ class OutputNeuron extends Neuron  {
 
   // bit hacky.. on the output neuron delta = y as input
   override def setResult(y:Double, weight: Double): Unit ={
-    val delta = value - y
+    val delta = (value - y)
     setError(delta)
 
     preNeurons.foreach(C => {

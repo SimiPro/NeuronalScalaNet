@@ -1,8 +1,8 @@
 package neuronalnet.classification.nets
 
-import neuronalnet.classification.layers.{OutputLayer, HiddenLayer, InputLayer, HiddenLayerBuilder}
-import scala.collection.mutable
+import neuronalnet.classification.layers.{HiddenLayer, HiddenLayerBuilder, InputLayer, OutputLayer}
 
+import scala.collection.mutable
 
 
 /**
@@ -12,14 +12,13 @@ import scala.collection.mutable
  */
 class NetBuilder {
   var inputLayerUnits = 2
-  var inputLayer:InputLayer = _
+  var inputLayer: InputLayer = _
 
   var hiddenLayerUnits = 1
   var hiddenLayers = mutable.MutableList[HiddenLayerBuilder]()
 
-  var outputLayer:OutputLayer = _
+  var outputLayer: OutputLayer = _
   var outputLayerUnits = 1
-
 
 
   def init() = {
@@ -29,42 +28,56 @@ class NetBuilder {
   init()
 
 
-
-  def setInputLayerUnits(units:Int):NetBuilder = {
+  def setInputLayerUnits(units: Int): NetBuilder = {
     inputLayerUnits = units
     this
   }
 
-  def addHiddenLayers(layer:HiddenLayerBuilder):NetBuilder = {
+  def addHiddenLayers(layer: HiddenLayerBuilder): NetBuilder = {
     hiddenLayers += layer
     this
   }
 
-  def setOutputLayerUnits(units:Int):NetBuilder = {
+  def setOutputLayerUnits(units: Int): NetBuilder = {
     outputLayerUnits = units
     this
   }
 
 
-
-  def build():Net = {
+  def build(): Net = {
     inputLayer = new InputLayer(2)
-    val hiddenLayer = new HiddenLayer(1)
+    val hiddenLayer = new HiddenLayer(2)
     outputLayer = new OutputLayer(1)
+
+
+
     val hiddenLayers_ = mutable.MutableList[HiddenLayer](hiddenLayer)
-    hiddenLayers_ += new HiddenLayer(1)
+    //hiddenLayers_ += new HiddenLayer(1)
     //hiddenLayers_ += new HiddenLayer(1)
 
-    val net:Net = new Net(inputLayer, hiddenLayers_, outputLayer)
+    val net: Net = new Net(inputLayer, hiddenLayers_, outputLayer)
 
+    /*
+        // input bias
+        inputLayer.neurons(0).postNeurons(1).weight = -0.942323210084099
+        inputLayer.neurons(0).postNeurons(2).weight = 1.20704207063339
+
+        inputLayer.neurons(1).postNeurons(1).weight = 2.30184752317254
+        inputLayer.neurons(1).postNeurons(2).weight = 14.993607769314
+
+        inputLayer.neurons(2).postNeurons(1).weight = -2.2736524305323
+        inputLayer.neurons(2).postNeurons(2).weight =  -14.8740590387072
+
+
+
+        // hidden
+        hiddenLayer.neurons(0).postNeurons(0).weight = 4.57205432165676
+        hiddenLayer.neurons(1).postNeurons(0).weight = 22.4465774962807
+        hiddenLayer.neurons(2).postNeurons(0).weight = -16.6739428978086
+
+    */
     net
   }
-
-
-
-
-
-
 
 
 }

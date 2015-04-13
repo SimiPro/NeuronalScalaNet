@@ -20,52 +20,14 @@ abstract class Layer(var units:Int) {
 
   createUnits()
 
-  def updateWeights(errors:Array[Array[Double]], alpha:Double) = {
-     for (i <- 0 until errors.length) {
-      val connectionsSize = neurons.apply(i).postNeurons.length
-      for (j <- 0 until connectionsSize) {
-        val connection = neurons(i).postNeurons(j)
-        connection.weight = connection.weight - alpha *errors(i)(j)
-      }
-    }
-
-
-    /*for (i <- 0 until neurons.length) {
-      for (j <- 0 until neurons.apply(i).postNeurons.length) {
-        val newWeight = alpha*errors(i*j)
-
-
-/*
-        // we just have the connections to the bias units cuse to increase the activationvalue to fire the next neuron
-        // but we have no weight to update on it. so overjump the bias neuron if our first connection is to one of it
-        // every layer has a bias unit except the outputlayer
-        if (connections.apply(0).postNeuron.isInstanceOf[BiasNeuron]){
-          connections.apply(1).weight = connections.apply(1).weight - alpha*newWeight
-        }else {
-          connections.apply(0).weight = connections.apply(0).weight - alpha*newWeight
-        }
-        */
-      }
-
-    }
-
-
-    for (i <- 0 until errors.length) {
-      for (j <- 0 until neurons.apply(i).postNeurons.length){
-        val connections = neurons.apply(i).postNeurons
-        val newWeight = alpha*errors(i)
-        // we just have the connections to the bias units cuse to increase the activationvalue to fire the next neuron
-        // but we have no weight to update on it. so overjump the bias neuron if our first connection is to one of it
-        // every layer has a bias unit except the outputlayer
-        if (connections.apply(0).postNeuron.isInstanceOf[BiasNeuron]){
-          connections.apply(1).weight = connections.apply(1).weight - alpha*newWeight
-        }else {
-          connections.apply(0).weight = connections.apply(0).weight - alpha*newWeight
-        }
-      }
-    }
-    */
+  def updateWeightsLight(m:Int, alpha:Double): Unit ={
+    neurons.foreach(N => {
+      N.postNeurons.foreach(C => {
+        C.updateWeight(m, alpha)
+      })
+    })
   }
+
 
   def createUnits()
 
@@ -78,18 +40,6 @@ abstract class Layer(var units:Int) {
           preNeuron.register(N)
         })
       })
-  }
-
-  def getError():Array[Array[Double]] = {
-    val error = Array.ofDim[Array[Double]](neurons.size)
-    for (i <- 0 until error.length) {
-      val connectionsSize = neurons.apply(i).postNeurons.length
-      error(i) = Array.ofDim[Double](connectionsSize)
-      for (j <- 0 until connectionsSize) {
-        error(i)(j) = neurons.apply(i).postNeurons.apply(j).grad
-      }
-    }
-    error
   }
 
 }

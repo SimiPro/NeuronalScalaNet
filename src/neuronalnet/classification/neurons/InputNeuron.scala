@@ -23,11 +23,4 @@ class InputNeuron extends Neuron {
     trigger(value)
   }
 
-  override def setResult(delta:Double, weight: Double): Unit = {
-    // delta*weight*value mby better ? cus why we dont use Theta1 on any point strange
-    setError(delta*value)
-
- //   postNeurons.apply(0).weight = postNeurons.apply(0).weight - MathHelper.alpha*getError()
-
-  }
 }

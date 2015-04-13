@@ -55,6 +55,6 @@ object MathHelper {
    */
   def randomInitializedNumber():Double = {
     val epsilon = 0.0001
-    random.nextDouble()*2 *epsilon - epsilon
+    random.nextDouble()*2 //*epsilon - epsilon
   }
 }

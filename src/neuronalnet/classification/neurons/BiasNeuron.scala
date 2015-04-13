@@ -1,6 +1,6 @@
 package neuronalnet.classification.neurons
 
-import ActivationWeight.ActivationWeight
+
 import ActivationWeight.ActivationWeight
 import neuronalnet.classification.Application
 

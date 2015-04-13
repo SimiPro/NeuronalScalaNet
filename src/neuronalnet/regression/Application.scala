@@ -5,6 +5,6 @@ package neuronalnet.regression
  */
 class Application {
 
-    
+
 
 }
