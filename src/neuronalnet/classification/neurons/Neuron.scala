@@ -1,7 +1,7 @@
-package neuronalnet.neurons
+package neuronalnet.classification.neurons
 
 import ActivationWeight.ActivationWeight
-import neuronalnet.math_.MathHelper
+import neuronalnet.classification.math_.MathHelper
 
 import scala.collection.mutable
 
@@ -9,7 +9,7 @@ import scala.collection.mutable
  * Created by Simon on 11.04.2015.
  */
 abstract class Neuron {
-  def setResult(y: Double)
+  def setResult(delta:Double, weight: Double)
 
   var value = 0.0
   var finalValue = 0.0
@@ -18,6 +18,12 @@ abstract class Neuron {
   var postNeurons:mutable.MutableList[Connection] = mutable.MutableList[Connection]()
   var preNeurons:mutable.MutableList[Connection] = mutable.MutableList[Connection]()
   var error = 0.0
+  var delta = 0.0
+
+  def getDelta():Double = {
+    delta
+  }
+
 
   def setError(error: Double) = {
     this.error = error
@@ -33,6 +39,8 @@ abstract class Neuron {
     this.value = 0
     this.finalValue = 0
     this.currentActivationValue = 0
+    this.error = 0.0
+    this.delta = 0.0
   }
 
   def increaseActivationValue(): Unit ={

@@ -1,7 +1,7 @@
-package neuronalnet.neurons
+package neuronalnet.classification.neurons
 
-import neuronalnet.math_.MathHelper
-import neuronalnet.Application
+import neuronalnet.classification.Application
+import neuronalnet.classification.math_.MathHelper
 import ActivationWeight.ActivationWeight
 
 /**
@@ -40,12 +40,14 @@ class OutputNeuron extends Neuron  {
     }
   }
 
-  override def setResult(y: Double): Unit ={
+
+  // bit hacky.. on the output neuron delta = y as input
+  override def setResult(y:Double, weight: Double): Unit ={
     val delta = value - y
     setError(delta)
 
     preNeurons.foreach(C => {
-      C.preNeuron.setResult(delta*C.weight)
+      C.setError(delta)
     })
   }
 }

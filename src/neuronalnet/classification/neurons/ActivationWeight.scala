@@ -1,4 +1,4 @@
-package neuronalnet.neurons
+package neuronalnet.classification.neurons
 
 /**
  * Created by Simon on 11.04.2015.

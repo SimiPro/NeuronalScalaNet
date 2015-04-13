@@ -1,4 +1,4 @@
-package neuronalnet.trainingData
+package neuronalnet.classification.trainingData
 
 /**
  * Created by Simon on 11.04.2015.

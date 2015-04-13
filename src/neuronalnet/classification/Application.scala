@@ -1,9 +1,11 @@
-package neuronalnet
+package neuronalnet.classification
 
-import neuronalnet.nets.{NetBuilder, Net}
-import neuronalnet.trainingData.TrainSet
+
+import neuronalnet.classification.nets.NetBuilder
+import neuronalnet.classification.trainingData.TrainSet
+
+
 import scala.collection.mutable
-
 
 /**
  * Created by Simon on 09.04.2015.
@@ -45,11 +47,3 @@ object Application {
 
   }
 }
-
-
-
-
-
-
-
-

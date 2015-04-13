@@ -1,9 +1,9 @@
-package neuronalnet.neurons
+package neuronalnet.classification.neurons
+
 
 import ActivationWeight.ActivationWeight
-import ActivationWeight.ActivationWeight
-import neuronalnet.math_.MathHelper
-import neuronalnet.Application
+import neuronalnet.classification.Application
+import neuronalnet.classification.math_.MathHelper
 
 /**
  * Created by Simon on 11.04.2015.
@@ -48,19 +48,14 @@ class HiddenNeuron extends Neuron {
   }
 
 
-
-  override def setResult(error: Double): Unit = {
+  override def setResult(delta:Double, weight: Double): Unit = {
     // set theta based on error from post neuron
-    setError(postNeurons.apply(0).postNeuron.getError()*finalValue)
+    setError(delta*finalValue)
 
-    // error = weight*delta_3
-
-   // postNeurons.apply(0).weight = postNeurons.apply(0).weight - MathHelper.alpha*getError()
-    val delta_2 = error*MathHelper.sigmoidGradient(value)
+    val delta_2:Double = weight*delta*(finalValue*(1-finalValue))
 
     preNeurons.foreach(C => {
-      //TODO:  why no need of *C.weight ??? ? ??
-        C.preNeuron.setResult(delta_2)
+      C.setError(delta_2)
     })
   }
 }

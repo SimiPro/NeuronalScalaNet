@@ -1,6 +1,6 @@
-package neuronalnet.nets
+package neuronalnet.classification.nets
 
-import neuronalnet.layers.{OutputLayer, HiddenLayer, InputLayer, HiddenLayerBuilder}
+import neuronalnet.classification.layers.{OutputLayer, HiddenLayer, InputLayer, HiddenLayerBuilder}
 import scala.collection.mutable
 
 
@@ -52,7 +52,8 @@ class NetBuilder {
     val hiddenLayer = new HiddenLayer(1)
     outputLayer = new OutputLayer(1)
     val hiddenLayers_ = mutable.MutableList[HiddenLayer](hiddenLayer)
-    
+    hiddenLayers_ += new HiddenLayer(1)
+    //hiddenLayers_ += new HiddenLayer(1)
 
     val net:Net = new Net(inputLayer, hiddenLayers_, outputLayer)
 

@@ -1,6 +1,6 @@
-package neuronalnet.layers
+package neuronalnet.classification.layers
 
-import neuronalnet.neurons.OutputNeuron
+import neuronalnet.classification.neurons.OutputNeuron
 
 /**
  * Created by Simon on 11.04.2015.

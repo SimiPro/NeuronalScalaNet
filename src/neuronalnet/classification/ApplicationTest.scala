@@ -1,6 +1,6 @@
-package neuronalnet
+package neuronalnet.classification
 
-import neuronalnet.math_.MathHelper
+import neuronalnet.classification.math_.MathHelper
 
 /**
  * Created by Simon on 11.04.2015.

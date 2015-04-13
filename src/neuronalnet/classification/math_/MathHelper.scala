@@ -1,4 +1,4 @@
-package neuronalnet.math_
+package neuronalnet.classification.math_
 
 
 import scala.util.Random
@@ -7,6 +7,7 @@ import scala.util.Random
  * Created by Simon on 11.04.2015.
  */
 object MathHelper {
+
   def divideEachElementInArray(x: Array[Double], value:Double):Array[Double] = {
     for (i <- 0 until x.size) {
       x(i) = x(i) / value
@@ -26,6 +27,8 @@ object MathHelper {
   def sigmoidGradient(z: Double) = {
     sigmoid(z) * (1 - sigmoid(z))
   }
+
+
 
   def cumulateArrays(x1: Array[Double], x2: Array[Double]): Array[Double] = {
     for (i <- 0 until x2.size) {

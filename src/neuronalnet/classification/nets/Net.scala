@@ -1,9 +1,9 @@
-package neuronalnet.nets
+package neuronalnet.classification.nets
 
 
-import neuronalnet.layers._
-import neuronalnet.math_.MathHelper
-import neuronalnet.trainingData.TrainSet
+import neuronalnet.classification.layers._
+import neuronalnet.classification.math_.MathHelper
+import neuronalnet.classification.trainingData.TrainSet
 
 import scala.collection.mutable
 
@@ -20,7 +20,7 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
   connectLayers()
 
   def setResult(y: Int) = {
-    outputLayer.neurons.apply(0).setResult(y)
+    outputLayer.neurons.apply(0).setResult(y, 0)
   }
 
   def connectLayers():Unit = {
@@ -50,11 +50,20 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     })
     J = J / trainData.size
 
-    var inputError = Array.ofDim[Double](inputLayer.neurons.size*inputLayer.postLayer.units)  // inputlayersize * hiddenlayer size?
-    var hiddenErrors = Array.ofDim[Array[Double]](hiddenLayers.size)
+    var inputError = Array.ofDim[Array[Double]](inputLayer.neurons.size)  // inputlayersize * hiddenlayer size?
+    val hiddenErrors = Array.ofDim[Array[Array[Double]]](hiddenLayers.size)
     // init hidden errors
     for (i <- 0 until hiddenLayers.size){
-      hiddenErrors(i) = Array.ofDim[Double](hiddenLayers(i).neurons.size) // mby hiddenlayersize * outputlayersize would work better
+      val actualLayer = hiddenLayers(i)
+      hiddenErrors(i) = Array.ofDim[Array[Double]](actualLayer.neurons.length)
+      for (j <- 0 until actualLayer.neurons.length) {
+        hiddenErrors(i)(j) = Array.ofDim[Double](actualLayer.neurons(j).postNeurons.size)
+      }
+       // mby hiddenlayersize * outputlayersize would work better
+    }
+
+    for (i <- 0 until inputLayer.neurons.length) {
+      inputError(i) = Array.ofDim[Double](inputLayer.neurons(i).postNeurons.size)
     }
 
 
@@ -65,20 +74,29 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
 
       // Hidden Layer
       for (i <- 0 until hiddenLayers.size){
-        val hiddenLayer = hiddenLayers.apply(i)
-        hiddenErrors(i) = MathHelper.cumulateArrays(hiddenErrors(i), hiddenLayer.getError())
+        val errorz = hiddenLayers(i).getError()
+        for (j <- 0 until errorz.length) {
+          hiddenErrors(i)(j) = MathHelper.cumulateArrays(hiddenErrors(i)(j),errorz(j))
+        }
       }
 
 
       // Input Layer
-      inputError = MathHelper.cumulateArrays(inputError, inputLayer.getError())
+      val gradPerLayer = inputLayer.getError()
+      for (i <- 0 until gradPerLayer.length) {
+        inputError(i) = MathHelper.cumulateArrays(inputError(i),gradPerLayer(i))
+      }
        //
     })
     // learning rate alpha
     val alpha = 0.9
 
     inputError = MathHelper.divideEachElementInArray(inputError, trainData.size)
-    hiddenErrors = MathHelper.divideEachElementInArray(hiddenErrors, trainData.size)
+
+
+    for (i <- 0 until hiddenErrors.length) {
+      hiddenErrors(i) = MathHelper.divideEachElementInArray(hiddenErrors(i), trainData.size)
+    }
 
     inputLayer.updateWeights(inputError, alpha)
 
@@ -96,6 +114,12 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     inputLayer.neurons.apply(2).setValue(input2)
   }
 
+  override def toString: String = {
+    "Im a Neural Network Net \n" +
+    "Input Layer: " + inputLayer.toString +
+    "\n HiddenLayers: " + hiddenLayers.foreach(B =>B )
+    "Output Layer: " + outputLayer.toString
+  }
 }
 
 

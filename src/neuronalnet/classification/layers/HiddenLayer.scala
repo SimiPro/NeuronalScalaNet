@@ -1,6 +1,6 @@
-package neuronalnet.layers
+package neuronalnet.classification.layers
 
-import neuronalnet.neurons.{BiasNeuron, HiddenNeuron}
+import neuronalnet.classification.neurons.{BiasNeuron, HiddenNeuron}
 
 /**
  * Created by Simon on 11.04.2015.

@@ -1,17 +1,19 @@
-package neuronalnet.neurons
+package neuronalnet.classification.neurons
 
 import ActivationWeight.ActivationWeight
 import ActivationWeight.ActivationWeight
-import neuronalnet.Application
+import neuronalnet.classification.Application
 
 /**
  * Created by Simon on 11.04.2015.
  */
 class BiasNeuron extends Neuron {
   this.value = 1
+  this.finalValue = 1
 
   override def setValue(value: Double): Unit = {
     this.value = 1
+    this.finalValue = 1
     trigger(1)
   }
 
@@ -37,15 +39,16 @@ class BiasNeuron extends Neuron {
       case ActivationWeight.reset => {
         resetValues()
         value = 1
+        finalValue = 1
         increaseCurrentActivationValue()
       }
     }
   }
 
-  override def setResult(error: Double): Unit = {
+  override def setResult(delta:Double, weight: Double): Unit = {
     // bias unit has no delta but an error value to correct
     // TODO: error = delta_3 * weight but we need just delta_3 change this
-    setError(postNeurons.apply(0).postNeuron.getError()*1)
+    setError(delta*1)
    // postNeurons.apply(0).weight = postNeurons.apply(0).weight - MathHelper.alpha*getError()
 
   }
