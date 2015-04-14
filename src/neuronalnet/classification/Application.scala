@@ -1,6 +1,7 @@
 package neuronalnet.classification
 
 
+import neuronalnet.classification.extern.filereader.MNISTReader
 import neuronalnet.classification.nets.NetBuilder
 import neuronalnet.classification.trainingData.TrainSet
 
@@ -15,6 +16,7 @@ object Application {
 
   def main(args: Array[String]) {
 
+    val reader:MNISTReader = new MNISTReader("E:\\Dev\\MachineLearning\\train-labels\\train-labels.idx1-ubyte","E:\\Dev\\MachineLearning\\train-images\\train-images.idx3-ubyte")
 
     var trainData = new mutable.MutableList[TrainSet]
     for (i <- 1 to 100) {
