@@ -18,16 +18,16 @@ object Application {
 
     var trainData = new mutable.MutableList[TrainSet]
     for (i <- 1 to 100) {
-      trainData += TrainSet(0,0,1)
+      trainData += TrainSet(Array[Double](0,0),Array[Double](1))
     }
     for (i <- 1 to 100) {
-      trainData += TrainSet(0,1,0)
+      trainData += TrainSet(Array[Double](1,0),Array[Double](0))
     }
     for (i <- 1 to 100) {
-      trainData += TrainSet(1,0,0)
+      trainData += TrainSet(Array[Double](0,1),Array[Double](0))
     }
     for (i <- 1 to 100) {
-      trainData += TrainSet(1,1,1)
+      trainData += TrainSet(Array[Double](1,1),Array[Double](1))
     }
 
 
@@ -44,14 +44,14 @@ object Application {
       }
     }
 
-    neuronalNet.input(1,1)
-    println("Input: 1 1 Output: " + neuronalNet.getResult())
-    neuronalNet.input(0,1)
-    println("Input: 0 1 Output: " + neuronalNet.getResult())
-    neuronalNet.input(1,0)
-    println("Input: 1 0 Output: " + neuronalNet.getResult())
-    neuronalNet.input(0,0)
-    println("Input: 0 0 Output: " + neuronalNet.getResult())
+    neuronalNet.input(Array[Double](1,1))
+    println("Input: 1 1 Output: " + neuronalNet.getResult()(0))
+    neuronalNet.input(Array[Double](0,1))
+    println("Input: 0 1 Output: " + neuronalNet.getResult()(0))
+    neuronalNet.input(Array[Double](1,0))
+    println("Input: 1 0 Output: " + neuronalNet.getResult()(0))
+    neuronalNet.input(Array[Double](0,0))
+    println("Input: 0 0 Output: " + neuronalNet.getResult()(0))
 
 
   }

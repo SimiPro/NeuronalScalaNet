@@ -7,9 +7,7 @@ import neuronalnet.classification.neurons.OutputNeuron
  */
 class OutputLayer(units:Int) extends Layer(units) {
 
-  def getResult():Double= {
-      neurons.apply(0).value
-  }
+
 
 
   override def createUnits(): Unit = {

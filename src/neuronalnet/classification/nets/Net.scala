@@ -12,14 +12,23 @@ import scala.collection.mutable
 class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer], outputLayer: OutputLayer) {
 
 
-  def getResult() = {
-    outputLayer.neurons.apply(0).value
+  def getResult():Array[Double] = {
+    val result = Array.ofDim[Double](outputLayer.neurons.length)
+    for (i <- 0 until result.length) {
+      result(i) = outputLayer.neurons(i).value
+    }
+    result
   }
 
   connectLayers()
 
-  def setResult(y: Int) = {
-    outputLayer.neurons.apply(0).setResult(y, 0)
+  def setResult(y: Array[Double]) = {
+    if (y.length != outputLayer.units) {
+      throw new Exception("Resultz from Y and neurons on outputlayer must be same size")
+    }
+    for (i <- 0 until y.length) {
+      outputLayer.neurons(i).setResult(y(i))
+    }
   }
 
   def connectLayers(): Unit = {
@@ -39,16 +48,24 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
   def train(trainData: mutable.MutableList[TrainSet]): Double = {
     var J = 0.0
     trainData.foreach(D => {
-      input(D.x1, D.x2)
-      val a_3 = outputLayer.getResult()
-      val cost = -D.y * math.log(a_3) - (1 - D.y) * math.log(1 - a_3)
+      val x = D.x
+      val y = D.y
+      input(x)
+      val a = getResult()
+
+      var cost = 0.0
+      for (i <- 0 until a.size) {
+        cost = cost + (-y(i))*math.log(a(i)) - (1 - y(i))*math.log(1-a(i))
+      }
+
+      //val cost = -D.y * math.log(a_3) - (1 - D.y) * math.log(1 - a_3)
       J = J + cost
     })
     J = J / trainData.size
 
 
     trainData.foreach(D => {
-      input(D.x1, D.x2)
+      input(D.x)
       setResult(D.y)
     })
 
@@ -66,11 +83,18 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     J
   }
 
-  def input(input1: Int, input2: Int): Unit = {
+  def input(x:Array[Double]): Unit = {
+
+    if (x.size != inputLayer.units) {
+      throw new Exception("Feature Vector & InputNeurons have to be same size")
+    }
     // trigger bias with value 1
     inputLayer.neurons.apply(0).setValue(1)
-    inputLayer.neurons.apply(1).setValue(input1)
-    inputLayer.neurons.apply(2).setValue(input2)
+
+    for (i <- 1 to inputLayer.units) {
+      inputLayer.neurons(i).setValue(x(i - 1))
+    }
+
   }
 
   override def toString: String = {

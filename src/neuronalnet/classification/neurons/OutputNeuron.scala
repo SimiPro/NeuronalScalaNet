@@ -40,8 +40,7 @@ class OutputNeuron extends Neuron  {
   }
 
 
-  // bit hacky.. on the output neuron delta = y as input
-  override def setResult(y:Double, weight: Double): Unit ={
+  override def setResult(y:Double): Unit ={
     val delta = (value - y)
     setError(delta)
 

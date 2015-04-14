@@ -47,15 +47,4 @@ class HiddenNeuron extends Neuron {
     this.value = this.value + value
   }
 
-
-  override def setResult(delta:Double, weight: Double): Unit = {
-    // set theta based on error from post neuron
-    setError(delta*finalValue)
-
-    val delta_2:Double = weight*delta*(finalValue*(1-finalValue))
-
-    preNeurons.foreach(C => {
-      C.setError(delta_2)
-    })
-  }
 }

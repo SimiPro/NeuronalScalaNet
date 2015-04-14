@@ -10,9 +10,7 @@ import scala.collection.mutable
  */
 abstract class Neuron {
 
-
-
-  def setResult(delta:Double, weight: Double): Unit = {
+  def setResult(y:Double): Unit = {
   }
 
   var value = 0.0
@@ -23,11 +21,6 @@ abstract class Neuron {
   var preNeurons:mutable.MutableList[Connection] = mutable.MutableList[Connection]()
   var error = 0.0
   var delta = 0.0
-
-  def getDelta():Double = {
-    delta
-  }
-
 
   def setError(error: Double) = {
     this.error = error

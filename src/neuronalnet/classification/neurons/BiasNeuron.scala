@@ -44,12 +44,4 @@ class BiasNeuron extends Neuron {
       }
     }
   }
-
-  override def setResult(delta:Double, weight: Double): Unit = {
-    // bias unit has no delta but an error value to correct
-    // TODO: error = delta_3 * weight but we need just delta_3 change this
-    setError(delta*1)
-   // postNeurons.apply(0).weight = postNeurons.apply(0).weight - MathHelper.alpha*getError()
-
-  }
 }
