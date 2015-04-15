@@ -11,6 +11,9 @@ import scala.collection.mutable
  * so just to make easy And and Or nets
  */
 class NetBuilder {
+
+
+
   var inputLayerUnits = 2
   var inputLayer: InputLayer = _
 
@@ -45,13 +48,15 @@ class NetBuilder {
 
 
   def build(): Net = {
-    inputLayer = new InputLayer(2)
-    val hiddenLayer = new HiddenLayer(2)
-    outputLayer = new OutputLayer(1)
+    inputLayer = new InputLayer(inputLayerUnits)
+    //val hiddenLayer = new HiddenLayer(2)
+    outputLayer = new OutputLayer(outputLayerUnits)
 
 
 
-    val hiddenLayers_ = mutable.MutableList[HiddenLayer](hiddenLayer)
+    val hiddenLayers_ = mutable.MutableList[HiddenLayer]()
+    hiddenLayers.foreach(B => hiddenLayers_ += B.build())
+
     //hiddenLayers_ += new HiddenLayer(1)
     //hiddenLayers_ += new HiddenLayer(1)
 

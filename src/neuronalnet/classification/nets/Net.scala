@@ -44,33 +44,61 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     outputLayer.connectPrevLayer(prevLayer)
   }
 
+  def costFunction(a_L:Array[Double], y:Array[Double]): Double = {
+    var cost = 0.0
+    for (i <- 0 until a_L.size) {
+      cost = cost + (-y(i))*math.log(a_L(i)) - (1 - y(i))*math.log(1-a_L(i))
+    }
+    cost
+  }
 
-  def train(trainData: mutable.MutableList[TrainSet]): Double = {
+  def gradientChecking() = {
+
+  }
+
+  /**
+   * Forward propagation through the net
+   * The Result is saved after each forward prop on the output layer we haven't it available for later use
+   * @param trainData
+   * @return
+   */
+  def forwardProp(trainData:mutable.MutableList[TrainSet]): Double = {
     var J = 0.0
     trainData.foreach(D => {
-      val x = D.x
-      val y = D.y
-      input(x)
+      input(D.x)
       val a = getResult()
-
-      var cost = 0.0
-      for (i <- 0 until a.size) {
-        cost = cost + (-y(i))*math.log(a(i)) - (1 - y(i))*math.log(1-a(i))
-      }
-
       //val cost = -D.y * math.log(a_3) - (1 - D.y) * math.log(1 - a_3)
-      J = J + cost
+      J = J + costFunction(a, D.y)
     })
-    J = J / trainData.size
+    J / trainData.size
+  }
 
-
+  /**
+   * BackProp. The gradient / error is summoned on each connection between the neurons.
+   * @param trainData
+   */
+  def backprop(trainData:mutable.MutableList[TrainSet]): Unit ={
+    var counter = 1
     trainData.foreach(D => {
+      if (counter %100 == 0) {
+        println("A: " + counter)
+      }
       input(D.x)
       setResult(D.y)
+      counter = counter + 1
     })
+  }
+
+  def train(trainData: mutable.MutableList[TrainSet]): Double = {
+    val J = forwardProp(trainData)
+    println("Cost: " + J)
+    backprop(trainData)
 
 
-    val alpha = 0.7
+
+    val alpha = 0.001
+
+    gradientChecking()
 
 
     inputLayer.updateWeightsLight(trainData.size, alpha)
