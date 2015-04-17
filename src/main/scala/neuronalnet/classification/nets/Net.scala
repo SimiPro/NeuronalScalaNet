@@ -1,8 +1,9 @@
 package neuronalnet.classification.nets
 
-
-import neuronalnet.classification.layers._
+import akka.actor._
+import neuronalnet.classification.neurons.akka._
 import neuronalnet.classification.trainingData.TrainSet
+import scala.concurrent.duration._
 
 
 import scala.collection.mutable
@@ -10,40 +11,61 @@ import scala.collection.mutable
 /**
  * Created by Simon on 11.04.2015.
  */
-class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer], outputLayer: OutputLayer) {
+class Net(inputLayer: ActorRef, hiddenLayers: mutable.MutableList[ActorRef], outputLayer: ActorRef, outputLayerUnits:Int) extends Actor with ActorLogging {
+  var resultArray = Array.ofDim[Double](outputLayerUnits)
 
-
-  def getResult(): Array[Double] = {
-    val result = Array.ofDim[Double](outputLayer.neurons.length)
-    for (i <- 0 until result.length) {
-      result(i) = outputLayer.neurons(i).value
-    }
-    result
-  }
 
   connectLayers()
+  registerResultListener()
+
+  def getResult(): Array[Double] = {
+    resultArray
+  }
+
+  def receive = {
+    case ResultArray(result) => this.resultArray = result
+    case Train(set) => train(set)
+    case x => log.info("Unkown Message: {} ", x )
+  }
+
+
+  def registerResultListener() : Unit = {
+    outputLayer ! RegisterResultListener(context.self)
+  }
+
+
+
+
+  def connectLayers() = {
+    // akka://net/outputlayer/unit(i)  = OutputNeuron(i)
+    // akka://net/hiddenlayer/unit(i) = HiddenNeuron(i)
+    // akka://net/inputLayer/unit(i) = InputNeuron(i)
+    var postHiddenLayer = hiddenLayers(0)
+    var preHiddenLayer:ActorRef = null
+
+
+    inputLayer ! ConnectPostLayer(postHiddenLayer)
+    postHiddenLayer ! ConnectPreLayer(inputLayer)
+    for (j <- 1 until hiddenLayers.length) {
+      val L = hiddenLayers(j)
+        for (i <- 1 until hiddenLayers.length) {
+          preHiddenLayer = postHiddenLayer
+          postHiddenLayer = hiddenLayers(i)
+
+          preHiddenLayer ! ConnectPostLayer(postHiddenLayer)
+          postHiddenLayer ! ConnectPreLayer(preHiddenLayer)
+        }
+
+    }
+    postHiddenLayer ! ConnectPostLayer(outputLayer)
+    outputLayer ! ConnectPreLayer(postHiddenLayer)
+    Thread.sleep(3000)
+  }
 
   def setResult(y: Array[Double]) = {
-    if (y.length != outputLayer.units) {
-      throw new Exception("Resultz from Y and neurons on outputlayer must be same size")
-    }
-    for (i <- 0 until y.length) {
-      outputLayer.neurons(i).setResult(y(i))
-    }
+    outputLayer ! ResultArray(y)
   }
 
-  def connectLayers(): Unit = {
-    hiddenLayers.apply(0).connectPrevLayer(inputLayer)
-    inputLayer.connectNextLayer(hiddenLayers.apply(0))
-
-    var prevLayer = hiddenLayers.apply(0)
-    // multi hiddenLayer handlin
-    for (i <- 1 until hiddenLayers.length) {
-      hiddenLayers(i).connectPrevLayer(prevLayer)
-      prevLayer = hiddenLayers(i)
-    }
-    outputLayer.connectPrevLayer(prevLayer)
-  }
 
   def costFunction(a_L: Array[Double], y: Array[Double]): Double = {
     var cost = 0.0
@@ -55,16 +77,12 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
 
   /**
    * Checks the gradient on the connections calculated by backprop
-   * @param m
+   * @param trainData
    */
   def gradientChecking(trainData: mutable.MutableList[TrainSet]) = {
-    inputLayer.neurons.foreach(N => {
-      N.postNeurons.foreach(_.gradientCheck(trainData, this))
-    })
+    inputLayer ! GradientCheck(trainData, this)
     hiddenLayers.foreach(L => {
-      L.neurons.foreach(N => {
-        N.postNeurons.foreach(_.gradientCheck(trainData, this))
-      })
+      L ! GradientCheck(trainData, this)
     })
   }
 
@@ -78,6 +96,7 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     var J = 0.0
     trainData.foreach(D => {
       input(D.x)
+      Thread.sleep(10000)
       val a = getResult()
       //val cost = -D.y * math.log(a_3) - (1 - D.y) * math.log(1 - a_3)
       J = J + costFunction(a, D.y)
@@ -106,39 +125,21 @@ class Net(inputLayer: InputLayer, hiddenLayers: mutable.MutableList[HiddenLayer]
     println("Cost: " + J)
     backprop(trainData)
 
-
-
     val alpha = 0.001
 
     gradientChecking(trainData)
 
-
-    inputLayer.updateWeightsLight(trainData.size, alpha)
+    inputLayer ! UpdateWeights(trainData.size, alpha)
 
     hiddenLayers.foreach(L => {
-      L.updateWeightsLight(trainData.size, alpha)
+      L ! UpdateWeights(trainData.size, alpha)
     })
-
-
 
     J
   }
 
   def input(x: Array[Double]): Unit = {
-
-    if (x.size != inputLayer.units) {
-      throw new Exception("Feature Vector & InputNeurons have to be same size")
-    }
-    // trigger bias with value 1
-    inputLayer.neurons.apply(0).setValue(1)
-
-    for (i <- 1 to inputLayer.units) {
-      async {
-
-      }
-      inputLayer.neurons(i).setValue(x(i - 1))
-    }
-
+    inputLayer ! ImpulsArray(x)
   }
 
   override def toString: String = {

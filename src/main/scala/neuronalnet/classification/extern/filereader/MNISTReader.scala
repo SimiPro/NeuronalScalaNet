@@ -8,8 +8,8 @@ import scala.collection.mutable
  * Created by Simon on 14.04.2015.
  */
 class MNISTReader(var pathToLabels: String, var pathToImages: String) {
-  pathToLabels = "E:/Dev\\MachineLearning\\t10k-labels-idx1-ubyte\\t10k-labels.idx1-ubyte"
-  pathToImages = "E:/Dev\\MachineLearning\\t10k-images-idx3-ubyte\\t10k-images.idx3-ubyte"
+  pathToLabels = "/Users/simipro/MachineLearning/t10k-labels.idx1-ubyte"
+  pathToImages = "/Users/simipro/MachineLearning/t10k-images.idx3-ubyte"
 
   var labels = new DataInputStream(new FileInputStream(pathToLabels))
   var images = new DataInputStream(new FileInputStream(pathToImages))

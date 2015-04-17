@@ -4,11 +4,12 @@ package neuronalnet.classification.neurons
 import ActivationWeight.ActivationWeight
 import neuronalnet.classification.Application
 import neuronalnet.classification.math_.MathHelper
+import neuronalnet.classification.neurons.akka.Impuls
 
 /**
  * Created by Simon on 11.04.2015.
  */
-class HiddenNeuron extends Neuron {
+class HiddenNeuron(index:Int) extends Neuron(index) {
 
 
   override def trigger(newValue: Double, activationWeight: ActivationWeight): Unit = {
@@ -28,7 +29,7 @@ class HiddenNeuron extends Neuron {
         finalValue = sigValue
         // trigger next connections
         postNeurons.foreach(C => {
-          C.postNeuron.trigger(sigValue * C.weight)
+          C ! Impuls(sigValue)
         })
       }
       case ActivationWeight.tolow => {

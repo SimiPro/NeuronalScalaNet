@@ -1,13 +1,16 @@
 package neuronalnet.classification.neurons
 
+import _root_.akka.actor.ActorRef
 import neuronalnet.classification.Application
 import neuronalnet.classification.math_.MathHelper
 import ActivationWeight.ActivationWeight
+import neuronalnet.classification.neurons.akka._
+
 
 /**
  * Created by Simon on 11.04.2015.
  */
-class OutputNeuron extends Neuron {
+class OutputNeuron(index:Int, outputLayer:ActorRef) extends Neuron(index) {
   var result: Double = 0
 
 
@@ -30,6 +33,7 @@ class OutputNeuron extends Neuron {
         increaseCurrentActivationValue()
         setValue(newValue)
         value = MathHelper.sigmoid(value)
+        outputLayer ! ResultImpuls(value, index)
       }
       case ActivationWeight.reset => {
         resetValues()
@@ -42,10 +46,9 @@ class OutputNeuron extends Neuron {
 
   override def setResult(y: Double): Unit = {
     val delta = (value - y)
-    setError(delta)
 
     preNeurons.foreach(C => {
-      C.setError(delta)
+      C ! DeltaImpuls(delta)
     })
   }
 }

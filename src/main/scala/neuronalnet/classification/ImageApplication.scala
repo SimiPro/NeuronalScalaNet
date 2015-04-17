@@ -1,8 +1,10 @@
 package neuronalnet.classification
 
+import akka.pattern.ask
 import neuronalnet.classification.extern.filereader.MNISTReader
 import neuronalnet.classification.layers.HiddenLayerBuilder
 import neuronalnet.classification.nets.{NetBuilder, Net}
+import neuronalnet.classification.neurons.akka.Train
 import neuronalnet.classification.trainingData.TrainSet
 import collection.mutable.MutableList
 
@@ -34,7 +36,7 @@ object ImageApplication {
     })
     reader.read()
 
-    val net: Net = new NetBuilder()
+    val ref = new NetBuilder()
       .setInputLayerUnits(784)
       .addHiddenLayers(new HiddenLayerBuilder().setUnits(100))
       .setOutputLayerUnits(10)
@@ -46,15 +48,15 @@ object ImageApplication {
     while (cost > 0.09) {
       println("Try: " + tryC)
       val trainData2 = trainData.map(x => (x, util.Random.nextDouble)).sortBy(_._2).take(sampleSize).map(_._1)
-      cost = net.train(trainData2)
+      //cost = ask(neuronalNet, Train(trainData)).mapTo[Double]
       println("Actual Cost: " + cost)
     }
 
 
 
 
-    net.input(trainData(17).x)
-    println("RESULT: " + net.getResult() + " Expected Result: " + trainData(17).y)
+  //  net.input(trainData(17).x)
+   // println("RESULT: " + net.getResult() + " Expected Result: " + trainData(17).y)
 
   }
 

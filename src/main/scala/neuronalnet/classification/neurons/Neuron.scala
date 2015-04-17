@@ -1,35 +1,35 @@
 package neuronalnet.classification.neurons
 
 import ActivationWeight.ActivationWeight
-import akka.actor.{ActorLogging, Actor}
+import _root_.akka.actor.{Props, ActorRef, ActorLogging, Actor}
 import neuronalnet.classification.math_.MathHelper
+import neuronalnet.classification.neurons.akka._
 
 import scala.collection.mutable
 
 /**
  * Created by Simon on 11.04.2015.
  */
-abstract class Neuron extends Actor with ActorLogging {
+abstract class Neuron(index:Int) extends Actor with ActorLogging {
 
   def setResult(y: Double): Unit = {
   }
+
+  /**
+   * Index in the Layer 0 ... n
+   */
+  def getIndex():Int = this.index
+
 
   var value = 0.0
   var finalValue = 0.0
   var activationValue = 0.0
   var currentActivationValue = 0.0
-  var postNeurons: mutable.MutableList[Connection] = mutable.MutableList[Connection]()
-  var preNeurons: mutable.MutableList[Connection] = mutable.MutableList[Connection]()
+  var postNeurons: mutable.MutableList[ActorRef] = mutable.MutableList[ActorRef]()
+  var preNeurons: mutable.MutableList[ActorRef] = mutable.MutableList[ActorRef]()
   var error = 0.0
   var delta = 0.0
 
-  def setError(error: Double) = {
-    this.error = error
-  }
-
-  def getError(): Double = {
-    return this.error
-  }
 
   def setValue(value: Double)
 
@@ -47,6 +47,17 @@ abstract class Neuron extends Actor with ActorLogging {
 
   def increaseCurrentActivationValue(): Unit = {
     currentActivationValue = currentActivationValue + 1
+  }
+
+  override def receive = {
+    case Impuls(value) => trigger(value)
+    case GradientCheck(trainData, net) => {
+      postNeurons.foreach(C => C ! GradientCheck(trainData, net))
+    }
+    case IncreaseActivationValue() => this.increaseActivationValue()
+    case ConnectPostNeuron(postNeuron) => register(postNeuron)
+    case ConnectPreNeuron(preNeuron) => preNeurons += preNeuron
+    case x => log.info("Unkown Message: {} ", x )
   }
 
   def trigger(newValue: Double): Unit = {
@@ -70,11 +81,11 @@ abstract class Neuron extends Actor with ActorLogging {
    * @param postNeuron
    * @return
    */
-  def register(postNeuron: Neuron) = {
-    postNeuron.increaseActivationValue()
-    var connection = Connection(postNeuron, this, MathHelper.randomInitializedNumber())
+  def register(postNeuron: ActorRef) = {
+    postNeuron ! IncreaseActivationValue()
+    var connection = context.actorOf(Props(new Connection(postNeuron, context.self, MathHelper.randomInitializedNumber())))
     postNeurons += connection
-    postNeuron.preNeurons += connection
+    postNeuron ! ConnectPreNeuron(connection)
   }
 
   override def toString(): String = {

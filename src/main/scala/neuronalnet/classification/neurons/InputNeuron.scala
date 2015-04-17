@@ -2,18 +2,19 @@ package neuronalnet.classification.neurons
 
 import ActivationWeight.ActivationWeight
 import neuronalnet.classification.Application
+import neuronalnet.classification.neurons.akka.Impuls
 
 /**
  * Created by Simon on 11.04.2015.
  */
-class InputNeuron extends Neuron {
+class InputNeuron(index:Int) extends Neuron(index) {
 
   override def trigger(newValue: Double, activationWeight: ActivationWeight): Unit = {
     if (Application.DEBUG) {
       println("New Input: " + newValue)
     }
     postNeurons.foreach(N => {
-      N.postNeuron.trigger(newValue * N.weight)
+      N ! Impuls(newValue)
     })
   }
 

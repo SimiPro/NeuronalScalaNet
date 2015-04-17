@@ -3,17 +3,18 @@ package neuronalnet.classification.neurons
 
 import ActivationWeight.ActivationWeight
 import neuronalnet.classification.Application
+import neuronalnet.classification.neurons.akka.Impuls
 
 /**
  * Created by Simon on 11.04.2015.
  */
-class BiasNeuron extends Neuron {
+/**
+ * Bias index always 0
+ */
+class BiasNeuron extends Neuron(0) {
   this.value = 1
   this.finalValue = 1
 
-  def receive = {
-
-  }
 
   override def setValue(value: Double): Unit = {
     this.value = 1
@@ -34,7 +35,7 @@ class BiasNeuron extends Neuron {
         // trigger next connections
         postNeurons.foreach(C => {
           // cause im a bias 1*
-          C.postNeuron.trigger(1 * C.weight)
+          C ! Impuls(1)
         })
       }
       case ActivationWeight.tolow => {

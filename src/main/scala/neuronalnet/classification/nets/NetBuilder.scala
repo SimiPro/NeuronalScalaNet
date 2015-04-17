@@ -1,5 +1,6 @@
 package neuronalnet.classification.nets
 
+import akka.actor.{Props, ActorRef, ActorSystem}
 import neuronalnet.classification.layers.{HiddenLayer, HiddenLayerBuilder, InputLayer, OutputLayer}
 
 import scala.collection.mutable
@@ -22,14 +23,6 @@ class NetBuilder {
   var outputLayer: OutputLayer = _
   var outputLayerUnits = 1
 
-
-  def init() = {
-
-  }
-
-  init()
-
-
   def setInputLayerUnits(units: Int): NetBuilder = {
     inputLayerUnits = units
     this
@@ -46,20 +39,28 @@ class NetBuilder {
   }
 
 
-  def build(): Net = {
-    inputLayer = new InputLayer(inputLayerUnits)
+
+  def build(): ActorRef = {
+    val actorSystem = ActorSystem("NeuronalNet")
+    val inputLayer = actorSystem.actorOf(Props(new InputLayer(inputLayerUnits)), "inputlayer")
+    val outputLayer = actorSystem.actorOf(Props(new OutputLayer(outputLayerUnits)), "outputlayer")
+
     //val hiddenLayer = new HiddenLayer(2)
-    outputLayer = new OutputLayer(outputLayerUnits)
 
+    if (hiddenLayers.size == 0) {
+      hiddenLayers += new HiddenLayerBuilder().setUnits(hiddenLayerUnits)
+    }
 
-
-    val hiddenLayers_ = mutable.MutableList[HiddenLayer]()
-    hiddenLayers.foreach(B => hiddenLayers_ += B.build())
+    val hiddenLayers_ = mutable.MutableList[ActorRef]()
+    for (i <- 0 until hiddenLayers.length) {
+     hiddenLayers_  += actorSystem.actorOf(Props(hiddenLayers(i).build()), "hiddenlayer"  + i)
+    }
 
     //hiddenLayers_ += new HiddenLayer(1)
     //hiddenLayers_ += new HiddenLayer(1)
 
-    val net: Net = new Net(inputLayer, hiddenLayers_, outputLayer)
+
+    val net = actorSystem.actorOf(Props(new Net(inputLayer, hiddenLayers_, outputLayer, outputLayerUnits)),"net")
 
     /*
         // input bias
